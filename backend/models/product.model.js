@@ -22,5 +22,6 @@ const productSchema = new mongoose.Schema(
 //make sure that each word is correctly spelled
 
 const Product = mongoose.model("Product", productSchema);
+//Product will be called singular here but in the mongoose db itll change to products.
 
 export default Product;
