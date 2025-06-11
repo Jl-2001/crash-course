@@ -25,6 +25,42 @@ export const useProductStore = create((set) => ({
       success: true,
       message: "Product was created, thank you for filling this out"
     };
+  },
+  fetchProducts: async () => {
+    const res = await fetch("/api/products");
+    const data = await res.json();
+    set({ products: data.data });
+  },
+  deleteProduct: async (pid) => {
+    const res = await fetch(`/api/products/${pid}`, {
+      method: "DELETE"
+    });
+    const data = await res.json();
+    if (!data.success) return { success: false, message: data.message };
+
+    //updates the ui right away
+    set((state) => ({
+      products: state.products.filter((product) => product._id !== pid)
+    }));
+    return { success: true, message: data.message };
+  },
+  updateProduct: async (pid, updatedProduct) => {
+    const res = await fetch(`/api/products/${pid}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }, // sending data to the server
+      body: JSON.stringify(updatedProduct)
+    });
+    const data = await res.json();
+    if (!data.success) return { success: false, message: data.message };
+    set((state) => ({
+      products: state.products.map((product) =>
+        product._id === pid ? data.data : product
+      )
+    }));
+    //if the set is not added then it is not updated or added to the ui
+    return { success: true, message: data.message };
   }
 }));
 // useProductStore: this global state is from zustand and helps export our functions
